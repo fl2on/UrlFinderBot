@@ -15,6 +15,9 @@ This Discord bot allows you to upload a .exe file and it will scan the file to f
 - DSharpPlus NuGet package
 - dnlib NuGet package
 
+## Considerations
+Note that this bot only works with applications built on the .NET framework. It is based on the dnlib library, which is specifically designed to parse .NET modules. Therefore, it may not be compatible with applications written in other programming languages or frameworks. Also note that it can only check applications that are not obfuscated.
+
 ## Installation
 
 1. Clone the repository.
