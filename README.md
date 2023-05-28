@@ -9,14 +9,14 @@ UrlFinderBot is a Discord bot that finds URLs in a .NET module.
 
 This Discord bot allows you to upload a .exe file and it will scan the file to find URLs within the .NET module. It uses the dnlib library to analyze the module and extract URLs from strings. The bot provides a response with the URLs found, if any. Please note that the bot includes safety checks to ensure the provided file is safe to analyze.
 
+## Considerations
+Note that this bot only works with applications built on the .NET framework. It is based on the dnlib library, which is specifically designed to parse .NET modules. Therefore, it may not be compatible with applications written in other programming languages or frameworks. Also note that it can only check applications that are not obfuscated.
+
 ## Prerequisites
 
 - .NET Framework 4.7.2 or higher
 - DSharpPlus NuGet package
 - dnlib NuGet package
-
-## Considerations
-Note that this bot only works with applications built on the .NET framework. It is based on the dnlib library, which is specifically designed to parse .NET modules. Therefore, it may not be compatible with applications written in other programming languages or frameworks. Also note that it can only check applications that are not obfuscated.
 
 ## Installation
 
