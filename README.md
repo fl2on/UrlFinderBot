@@ -3,7 +3,7 @@
 UrlFinderBot is a Discord bot that finds URLs in a .NET module.
 
 ## Screenshot
-![image](https://github.com/qzxtu/UrlFinderBot/assets/69091361/b6475c68-869a-4622-9c1f-9349ebd4a488)
+![image](https://github.com/qzxtu/UrlFinderBot/assets/69091361/ccb5cae2-0246-48ec-936b-7d3f3c341043)
 
 ## Description
 
