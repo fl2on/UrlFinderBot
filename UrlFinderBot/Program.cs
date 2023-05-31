@@ -119,7 +119,7 @@ public abstract class Program
     {
         _discord = new DiscordClient(new DiscordConfiguration
         {
-            Token = "ODAzMzU5Mjk4NzgwNTI4Njkx.GSNHDb.DMWzmn89exFcTzcYkA40q7pFjKERw39a_IBx-E",
+            Token = "Your Token Here",
             TokenType = TokenType.Bot
         });
         var slash = _discord.UseSlashCommands();
