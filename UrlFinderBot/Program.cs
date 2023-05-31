@@ -1,12 +1,11 @@
-﻿using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using System.Reflection;
+using System.Text;
+using static System.Text.RegularExpressions.Regex;
 
 namespace UrlFinderBot;
 
@@ -34,9 +33,9 @@ public class UrlFinderCommand : ApplicationCommandModule
                 Color = DiscordColor.Blue
             };
 
-            using (var client = new WebClient())
+            using (var client = new HttpClient())
             {
-                var fileBytes = await client.DownloadDataTaskAsync(exeFile.Url);
+                var fileBytes = await client.GetByteArrayAsync(exeFile.Url);
 
                 // Perform additional security checks on the file
                 var isSafe = IsFileSafe(fileBytes);
@@ -74,12 +73,11 @@ public class UrlFinderCommand : ApplicationCommandModule
                             if (op.OpCode == OpCodes.Ldstr)
                             {
                                 var str = op.Operand.ToString();
-                                if (Regex.IsMatch(str,
+                                if (str != null && !IsMatch(str,
                                         @"(?<=\()\b(https?://|www\.)[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|](?=\))|(?<=(?<wrap>[=~|_#]))\b(https?://|www\.)[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|](?=\k<wrap>)|\b(https?://|www\.)[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]"))
-                                {
-                                    messageBuilder.AppendLine(str);
-                                    urlFound = true;
-                                }
+                                    continue;
+                                messageBuilder.AppendLine(str);
+                                urlFound = true;
                             }
                     }
                 }
@@ -87,7 +85,7 @@ public class UrlFinderCommand : ApplicationCommandModule
                 if (!urlFound)
                     messageBuilder.AppendLine("No URLs found");
 
-                embedBuilder.AddField("URLFound: ", "```" + messageBuilder.ToString() + "```");
+                embedBuilder.AddField("URLFound: ", "```" + messageBuilder + "```");
             }
 
             builder.AddEmbed(embedBuilder.Build());
@@ -96,10 +94,9 @@ public class UrlFinderCommand : ApplicationCommandModule
         {
             var messageBuilder = new StringBuilder();
 
-            if (e.ToString().Contains(".NET data directory RVA is 0"))
-                messageBuilder.AppendLine("The application is not made with .NET or is obfuscated");
-            else
-                messageBuilder.AppendLine("Error");
+            messageBuilder.AppendLine(e.ToString().Contains(".NET data directory RVA is 0")
+                ? "The application is not made with .NET or is obfuscated"
+                : "Error");
 
             builder.WithContent(messageBuilder.ToString());
         }
@@ -107,28 +104,28 @@ public class UrlFinderCommand : ApplicationCommandModule
         await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, builder);
     }
 
-    private bool IsFileSafe(byte[] fileBytes)
+    private static bool IsFileSafe(IReadOnlyList<byte> fileBytes)
     {
-        byte[] exeSignature = { 0x4D, 0x5A };
-        return fileBytes.Length >= 2 && fileBytes[0] == exeSignature[0] && fileBytes[1] == exeSignature[1];
+        var exeSignature = "MZ"u8.ToArray();
+        return fileBytes.Count >= 2 && fileBytes[0] == exeSignature[0] && fileBytes[1] == exeSignature[1];
     }
 }
 
-public class Program
+public abstract class Program
 {
-    public static DiscordClient discord;
+    private static DiscordClient? _discord;
 
-    public static async Task Main(string[] args)
+    public static async Task Main()
     {
-        discord = new DiscordClient(new DiscordConfiguration
+        _discord = new DiscordClient(new DiscordConfiguration
         {
-            Token = "Your Token Here",
+            Token = "ODAzMzU5Mjk4NzgwNTI4Njkx.GSNHDb.DMWzmn89exFcTzcYkA40q7pFjKERw39a_IBx-E",
             TokenType = TokenType.Bot
         });
-        var slash = discord.UseSlashCommands();
+        var slash = _discord.UseSlashCommands();
         await slash.RefreshCommands();
         slash.RegisterCommands(typeof(UrlFinderCommand).GetTypeInfo().Assembly);
-        await discord.ConnectAsync();
+        await _discord.ConnectAsync();
         await Task.Delay(-1);
     }
 }
